@@ -215,39 +215,44 @@ class QuestionGraph {
   getRemainingQuestions(data = {}) {
     let vis = new Set();
     let questionIds = new Set();
-    let q = [this.head];
+    let q = [{ path: [this.head.id], item: this.head }];
+    let depth = 0;
+    window.tmz = this.nodeMap;
 
     while (q.length) {
-      const item = q.shift();
+      const queueItem = q.shift();
+      const item = queueItem.item;
       if (!vis.has(item.id)) {
         vis.add(item.id);
 
-        console.log(item.id)
+        // console.log(item.id)
 
         // check if submittable question
         if (item.data && isString(item.data)) {
           const questionId = item.data;
 
-          console.log(questionId);
-          if (data[questionId] == null) {
+          // console.log(questionId);
+          if (data[questionId] == null ) { // && queueItem.path.length < 5) {
+            console.log(questionId, queueItem.path);
             questionIds.add(questionId);
           }
         }
 
-        console.log(item);
+        // console.log(queueItem);
         for (const edge of item.edges) {
           const edgeRes = edge.question(data);
 
-          console.log(edge.toId, edgeRes);
+          // console.log(edge.toId, edgeRes);
           // allow possibles
           if (edgeRes !== false) {
-            q.push(this.nodeMap.get(edge.toId));
+            let node = this.nodeMap.get(edge.toId);
+            q.push({ path: queueItem.path.slice().concat([node.id]), item: node });
           }
         }
       }
     }
 
-    console.log('what questions', questionIds);
+    //console.log('what questions', questionIds);
     let res = [];
     for (const questionId of questionIds) {
       const question = this.questionMap.get(questionId);
@@ -291,10 +296,54 @@ class QuestionGraph {
     return Array.from(resultIds);
   }
 
+  getPositiveResultsIds(data = {}) {
+    let vis = new Set();
+    let resultIds = new Set();
+    let q = [this.head];
+    let nodeMap = this.nodeMap;
+
+    q.push.apply(q, this.head.edges.map((e) => nodeMap.get(e.toId) ));
+
+    while (q.length) {
+      const item = q.shift();
+      if (!vis.has(item.id)) {
+        vis.add(item.id);
+
+        // check if result
+        if (item.data && !isString(item.data)) {
+          const resultId = item.id;
+          resultIds.add(resultId);
+        }
+
+        for (const edge of item.edges) {
+          const edgeRes = edge.question(data);
+
+          // allow possibles
+          if (edgeRes === true) {
+            // debugger;
+            // edge.question(data);
+            q.push(this.nodeMap.get(edge.toId));
+          }
+        }
+      }
+    }
+
+    return Array.from(resultIds);
+  }
+
   //bfs to find possible results
   getPossibleResults(data = {}) {
     const possibleResultIds = this.getPossibleResultsIds(data);
     return possibleResultIds.map(resultId => {
+      const result = this.nodeMap.get(resultId);
+      return { resultId, result };
+    });
+  }
+
+  getPositiveResults(data = {}) {
+    const positiveResultIds = this.getPositiveResultsIds(data);
+    console.log(positiveResultIds);
+    return positiveResultIds.map((resultId, i) => {
       const result = this.nodeMap.get(resultId);
       return { resultId, result };
     });

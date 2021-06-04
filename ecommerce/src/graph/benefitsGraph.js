@@ -46,7 +46,7 @@ age,What is your age as the survivor?,number,,
 dependant,Are you a dependant of the deceased?,yes/no,,relationship = parent
 disabled,Are you disabled?,yes/no,,"relationship = spouse, divorced spouse, child"
 caringForChild,Are you taking care of a child less than 16 or disabled?,yes/no,,"relationship = spouse, divorced spouse, parent to child"
-unmarried,are you unmarried?,yes/no,,"relationship = spouse, divorced spouse, parent to child, child"
+unmarried,Are you unmarried?,yes/no,,"relationship = spouse, divorced spouse, parent to child, child"
 married10Years,Did your marriage last for at least 10 years?,yes/no,,relationship = divorced spouse
 fullTimeStudent,Are you a full time student?,yes/no,,relationship = child; age = 18-19
 noSurvivingSpouse,Is there no surviving spouse?,yes/no,,relationship = child
@@ -238,7 +238,7 @@ for (const edge of edgeJson) {
             return (data) => {
                 if (data[from.questionId] != null) {
                     const res = !!(compiled || noop)(data);
-                    console.log(from.node.id, from.questionId, edge.when, res)
+                    // console.log(from.node.id, from.questionId, edge, edge.when, res)
                     return res;
                 }
             };

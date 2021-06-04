@@ -170,7 +170,31 @@
         </div>
       </div>
       <div class="grid-col-8">
-        <h2>Benefits</h2>
+        <h2>Matched Benefits</h2>
+        <div>
+          <div v-if="positiveResults.length">
+            <div
+              class="usa-card margin-y-1"
+              v-for="result in positiveResults"
+              :key="result.resultId"
+            >
+              <div class="usa-card__container">
+                <header class="usa-card__header">
+                  <h2 class="usa-card__heading">{{ result.result.data.name }} - {{ result.result.data.identifier }}</h2>
+                </header>
+                <div class="usa-card__body" v-if="result.result.data.description">
+                  <p>{{ result.result.data.description }}</p>
+                </div>
+                <div class="usa-card__footer" v-if="result.result.data.url">
+                  <a :href="result.result.data.url" target="_blank" class="usa-button">Learn More</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-else>No have no results</div>
+        </div>
+
+        <h2>Potential Benefits</h2>
 
         <div>
           <div v-if="possibleResults.length">
@@ -218,10 +242,13 @@ export default {
 
   computed: {
     remainingQuestions: function () {
-      return questionGraph.getRemainingQuestions(this.data);
+      return questionGraph.getRemainingQuestions(this.data); // .slice(0, 10);
     },
     possibleResults: function () {
       return questionGraph.getPossibleResults(this.data);
+    },
+    positiveResults: function () {
+      return questionGraph.getPositiveResults(this.data);
     },
     completedQuestions: function () {
       return questionGraph.getCompletedQuestions(this.data);
